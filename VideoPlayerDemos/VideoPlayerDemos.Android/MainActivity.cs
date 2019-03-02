@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
@@ -8,6 +7,8 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Android.Content;
+using System.Collections.Generic;
+using Android.Provider;
 
 namespace ClipBrowser.Droid
 {
@@ -20,7 +21,7 @@ namespace ClipBrowser.Droid
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
-
+            SetTheme(Android.Resource.Style.ThemeNoTitleBarFullScreen);
             base.OnCreate(bundle);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
@@ -32,7 +33,7 @@ namespace ClipBrowser.Droid
 
         public static readonly int PickImageId = 1000;
 
-        public TaskCompletionSource<string> PickImageTaskCompletionSource { set; get; }
+        public TaskCompletionSource<KeyValuePair<List<string>, int>?> PickImageTaskCompletionSource { set; get; }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
@@ -41,9 +42,14 @@ namespace ClipBrowser.Droid
             if (requestCode == PickImageId)
             {
                 if ((resultCode == Result.Ok) && (data != null))
-                {
-                    // Set the filename as the completion of the Task
-                    PickImageTaskCompletionSource.SetResult(data.DataString);
+                {                    
+                    var imagePicked = AndroidNetUriToPath.GetPath(this,data.Data);
+                    System.Diagnostics.Debug.WriteLine(imagePicked);
+                    string imageDir = System.IO.Path.GetDirectoryName(imagePicked);
+                    var imageList = new List<string>(System.IO.Directory.GetFiles(imageDir, "*.mp4"));
+                    int index = imageList.IndexOf(imagePicked);                  
+                    KeyValuePair<List<string>, int>? result = new KeyValuePair<List<string>, int>(imageList, index);
+                    PickImageTaskCompletionSource.SetResult(result);
                 }
                 else
                 {

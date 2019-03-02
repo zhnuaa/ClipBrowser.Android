@@ -9,9 +9,7 @@
             <video:ResourceVideoSource>
                 <video:ResourceVideoSource.Path>
                     <OnPlatform x:TypeArguments="x:String">
-                        <On Platform="iOS" Value="Videos/iOSApiVideo.mp4" />
                         <On Platform="Android" Value="AndroidApiVideo.mp4" />
-                        <On Platform="UWP" Value="Videos/UWPApiVideo.mp4" />
                     </OnPlatform>
                 </video:ResourceVideoSource.Path>
             </video:ResourceVideoSource>

@@ -3,16 +3,84 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:video="clr-namespace:FormsVideoLibrary"
              x:Class="ClipBrowser.PlayLibraryVideoPage"
-             Title="Play Library Video">
-    <StackLayout>
+             Title="Play Library Video" >
+    <StackLayout BackgroundColor="Black">
+        <StackLayout Orientation="Horizontal" BackgroundColor="Black">
+            <Label x:Name="videoName"
+                   Margin="10"
+                   BackgroundColor="Transparent"
+                   TextColor="Gray"
+                   HorizontalTextAlignment="Start"
+                   VerticalTextAlignment="Center"
+                   FontSize="Medium"
+                   VerticalOptions="Center"
+                   HorizontalOptions="FillAndExpand"
+                   HeightRequest="40"/>
+            <Button Text="选择目录"
+                Margin="20"
+                BackgroundColor="Transparent"
+                BorderColor="Gray"
+                BorderWidth="1"
+                TextColor="Gray"
+                HorizontalOptions="End"
+                Clicked="OnSelectVideoClicked"
+                HeightRequest="40"/>
+        </StackLayout>
+        
         <video:VideoPlayer x:Name="videoPlayer"
                            AutoLoop="True"
                            AreTransportControlsEnabled="False"
                            VerticalOptions="FillAndExpand" />
-
-        <Button Text="Show Video Library"
-                Margin="10"
-                HorizontalOptions="Center"
-                Clicked="OnShowVideoLibraryClicked" />
+        <StackLayout Orientation="Horizontal" HorizontalOptions="End" Margin="5">
+            <Button Text="上一个"
+                    Margin="10"
+                    BackgroundColor="Transparent"
+                    BorderColor="Gray"
+                    BorderWidth="1"
+                    TextColor="Gray"
+                    VerticalOptions="End"
+                    HorizontalOptions="Center"
+                    HeightRequest="40"
+                    WidthRequest="75"
+                    Clicked="OnPreviousClicked"/>
+            <Button Text="删除"
+                    Margin="10"
+                    BackgroundColor="Transparent"
+                    BorderColor="Gray"
+                    BorderWidth="1"
+                    TextColor="Gray"
+                    VerticalOptions="End"
+                    HorizontalOptions="Center"
+                    HeightRequest="40"
+                    WidthRequest="75"
+                    Clicked="OnDeleteClicked"/>
+            <StackLayout Margin="10"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="End" Margin="5" >
+            <Button Text="标记"
+                    Margin="10"
+                    BackgroundColor="Transparent"
+                    BorderColor="Gray"
+                    BorderWidth="1"
+                    TextColor="Gray"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center"
+                    HeightRequest="40"
+                    WidthRequest="75"
+                    Clicked="OnMarkClicked"/>
+            <Button Text="下一个"
+                    Margin="10"
+                    BackgroundColor="Transparent"
+                    BorderColor="Gray"
+                    BorderWidth="1"
+                    TextColor="Gray"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center"
+                    HeightRequest="40"
+                    WidthRequest="75"
+                    Clicked="OnNextClicked"/>
+            <StackLayout Margin="10"/>
+        </StackLayout>
+        <StackLayout Margin="20"/>
     </StackLayout>
 </ContentPage>

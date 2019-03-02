@@ -16,7 +16,8 @@ namespace ClipBrowser
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new HomePage());
+            //MainPage = new NavigationPage(new HomePage());
+            MainPage = new PlayLibraryVideoPage();
         }
 
         protected override void OnStart()

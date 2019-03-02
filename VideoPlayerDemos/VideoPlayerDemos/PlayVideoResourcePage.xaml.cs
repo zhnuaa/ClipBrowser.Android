@@ -13,7 +13,7 @@ namespace ClipBrowser
     {
         public PlayVideoResourcePage()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
     }
 }
