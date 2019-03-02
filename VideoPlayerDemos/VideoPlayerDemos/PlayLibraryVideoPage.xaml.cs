@@ -16,7 +16,7 @@ namespace ClipBrowser
             InitializeComponent();
             currentIndex = 0;
             videoList = new List<string>();
-            videoName.Text = "";
+            resetInfo();
         }
 
        async void OnSelectVideoClicked(object sender, EventArgs args)
@@ -28,13 +28,14 @@ namespace ClipBrowser
 
             if (videoDict!=null)
             {
+                resetInfo();
                 currentIndex = videoDict.Value.Value;
                 videoList = videoDict.Value.Key;
                 videoPlayer.Source = new FileVideoSource
                 {
                     File = videoList[currentIndex]
                 };
-                videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+                updateInfo(videoList.Count, 1, 0, 0);
             }
             btn.IsEnabled = true;
        }
@@ -54,7 +55,7 @@ namespace ClipBrowser
                 {
                     File = videoList[currentIndex]
                 };
-                videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+                updateInfo(0, 0, 0, 0);
                 System.Diagnostics.Debug.WriteLine(videoList[currentIndex]);
             }
             else
@@ -78,14 +79,14 @@ namespace ClipBrowser
                 videoPlayer.Source = new FileVideoSource
                 {
                     File = videoList[currentIndex]
-                };
-                videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+                };                
                 System.Diagnostics.Debug.WriteLine(videoList[currentIndex]);
             }
             else
             {
                 videoPlayer.Stop();
             }
+            updateInfo(0, 1, 0, 0);
             btn.IsEnabled = true;
         }
         async private void OnDeleteClicked(object sender, EventArgs e)
@@ -101,9 +102,9 @@ namespace ClipBrowser
                 videoPlayer.Source = new FileVideoSource
                 {
                     File = videoList[currentIndex+1]
-                };
-                videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+                };                
             }
+            updateInfo(0, 1, 1, 0);
             await Task.Run(() => {
                 if (System.IO.File.Exists(videoList[currentIndex]))
                 {
@@ -136,10 +137,27 @@ namespace ClipBrowser
                 videoPlayer.Source = new FileVideoSource
                 {
                     File = videoList[currentIndex]
-                };
-                videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+                };               
             }
+            updateInfo(0, 1, 0, 1);
             btn.IsEnabled = true;
+        }
+        private void updateInfo(int deltaTotal=0,int deltaLeft=0,int deltaDelete=0,int deltaMark=0)
+        {
+            videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
+            int num = 0;
+            totalNum.Text = string.Format("{0}:总数", int.TryParse(totalNum.Text.Split(':')[0], out num) ? (num + deltaTotal).ToString() : deltaTotal.ToString());
+            leftNum.Text = string.Format("{0}:剩余", int.TryParse(leftNum.Text.Split(':')[0], out num) ? (num - deltaLeft).ToString() : totalNum.Text.Split(':')[0]);
+            deleteNum.Text = string.Format("{0}:删除", int.TryParse(deleteNum.Text.Split(':')[0], out num) ? (num + deltaDelete).ToString() : deltaDelete.ToString());
+            markNum.Text = string.Format("{0}:标记", int.TryParse(markNum.Text.Split(':')[0], out num) ? (num + deltaMark).ToString() : deltaMark.ToString());
+        }
+        private void resetInfo()
+        {
+            videoName.Text = "";
+            totalNum.Text = "";
+            leftNum.Text = "";
+            deleteNum.Text = "";
+            markNum.Text = "";
         }
     }
 }

@@ -5,7 +5,8 @@
              x:Class="ClipBrowser.PlayLibraryVideoPage"
              Title="Play Library Video" >
     <StackLayout BackgroundColor="Black">
-        <StackLayout Orientation="Horizontal" BackgroundColor="Black">
+        <StackLayout Orientation="Horizontal" 
+                     BackgroundColor="Transparent">
             <Label x:Name="videoName"
                    Margin="10"
                    BackgroundColor="Transparent"
@@ -31,7 +32,36 @@
                            AutoLoop="True"
                            AreTransportControlsEnabled="False"
                            VerticalOptions="FillAndExpand" />
-        <StackLayout Orientation="Horizontal" HorizontalOptions="End" Margin="5">
+        <StackLayout Orientation="Horizontal" 
+                     HorizontalOptions="End" 
+                     BackgroundColor="Transparent"
+                     Margin="5">
+            <StackLayout Orientation="Vertical" 
+                         BackgroundColor="Transparent"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         Margin="5">
+                <Label x:Name="totalNum" 
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"
+                       TextColor="Gray"
+                       BackgroundColor="Transparent"
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="End"
+                       FontSize="Small"
+                       HeightRequest="20"/>
+                <Label x:Name="leftNum"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"
+                       TextColor="Gray"
+                       BackgroundColor="Transparent"
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="End"
+                       FontSize="Small"
+                       HeightRequest="20"/>
+            </StackLayout>
+            <StackLayout WidthRequest="30"
+                         BackgroundColor="Transparent"/>
             <Button Text="上一个"
                     Margin="10"
                     BackgroundColor="Transparent"
@@ -54,9 +84,39 @@
                     HeightRequest="40"
                     WidthRequest="75"
                     Clicked="OnDeleteClicked"/>
-            <StackLayout Margin="10"/>
+            <StackLayout Margin="10"
+                         BackgroundColor="Transparent"/>
         </StackLayout>
-        <StackLayout Orientation="Horizontal" HorizontalOptions="End" Margin="5" >
+        <StackLayout Orientation="Horizontal" 
+                     HorizontalOptions="End" 
+                     BackgroundColor="Transparent"
+                     Margin="5" >
+            <StackLayout Orientation="Vertical" 
+                         BackgroundColor="Transparent"
+                         HorizontalOptions="End"
+                         VerticalOptions="Center"
+                         Margin="5">
+                <Label x:Name="deleteNum" 
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"
+                       TextColor="Gray"
+                       BackgroundColor="Transparent"
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="End"
+                       FontSize="Small"
+                       HeightRequest="20"/>
+                <Label x:Name="markNum"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"
+                       TextColor="Gray"
+                       BackgroundColor="Transparent"
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="End"
+                       FontSize="Small"
+                       HeightRequest="20"/>
+            </StackLayout>
+            <StackLayout WidthRequest="30"
+                         BackgroundColor="Transparent"/>
             <Button Text="标记"
                     Margin="10"
                     BackgroundColor="Transparent"
@@ -81,6 +141,7 @@
                     Clicked="OnNextClicked"/>
             <StackLayout Margin="10"/>
         </StackLayout>
-        <StackLayout Margin="20"/>
+        <StackLayout HeightRequest="20"
+                     BackgroundColor="Transparent"/>
     </StackLayout>
 </ContentPage>
