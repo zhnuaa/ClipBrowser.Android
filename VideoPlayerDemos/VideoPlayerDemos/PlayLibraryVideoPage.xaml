@@ -2,12 +2,24 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:video="clr-namespace:FormsVideoLibrary"
+             xmlns:local="clr-namespace:ClipBrowser"
              x:Class="ClipBrowser.PlayLibraryVideoPage"
              Title="Play Library Video" >
-    <StackLayout BackgroundColor="Black">
+    <StackLayout x:Name="rootStack"
+                 BackgroundColor="Black" 
+                 FlowDirection="{Binding ScreenDirection}">
+        <StackLayout.BindingContext>
+            <local:VideoListStatus/>
+        </StackLayout.BindingContext>
         <StackLayout Orientation="Horizontal" 
                      BackgroundColor="Transparent">
-            <Label x:Name="videoName"
+            <ImageButton Source="mirror_screen.png"
+                         BackgroundColor="Transparent"
+                         Margin="20"         
+                         HorizontalOptions="End"    
+                         Clicked="OnMirrorScreenClicked"
+                         HeightRequest="30"/>
+            <Label Text="{Binding CurrentVideoName}"
                    Margin="10"
                    BackgroundColor="Transparent"
                    TextColor="Gray"
@@ -16,32 +28,30 @@
                    FontSize="Medium"
                    VerticalOptions="Center"
                    HorizontalOptions="FillAndExpand"
-                   HeightRequest="40"/>
-            <Button Text="选择目录"
-                Margin="20"
-                BackgroundColor="Transparent"
-                BorderColor="Gray"
-                BorderWidth="1"
-                TextColor="Gray"
-                HorizontalOptions="End"
-                Clicked="OnSelectVideoClicked"
-                HeightRequest="40"/>
+                   HeightRequest="30"/>            
+            <ImageButton Source="open.png"
+                         BackgroundColor="Transparent"
+                         Margin="20"
+                         HorizontalOptions="End"
+                         Clicked="OnSelectVideoClicked"
+                         HeightRequest="30"/>
         </StackLayout>
-        
+
         <video:VideoPlayer x:Name="videoPlayer"
                            AutoLoop="True"
                            AreTransportControlsEnabled="False"
-                           VerticalOptions="FillAndExpand" />
+                           VerticalOptions="FillAndExpand"
+                           Source="{Binding CurrentVideo}"/>
         <StackLayout Orientation="Horizontal" 
                      HorizontalOptions="End" 
                      BackgroundColor="Transparent"
-                     Margin="5">
+                     Spacing="20">
             <StackLayout Orientation="Vertical" 
                          BackgroundColor="Transparent"
                          HorizontalOptions="End"
                          VerticalOptions="Center"
                          Margin="5">
-                <Label x:Name="totalNum" 
+                <Label Text="{Binding TotalNum, StringFormat='{0}:总数'}"
                        VerticalOptions="Center"
                        HorizontalOptions="End"
                        TextColor="Gray"
@@ -50,7 +60,7 @@
                        HorizontalTextAlignment="End"
                        FontSize="Small"
                        HeightRequest="20"/>
-                <Label x:Name="leftNum"
+                <Label Text="{Binding LeftNum, StringFormat='{0}:剩余'}"
                        VerticalOptions="Center"
                        HorizontalOptions="End"
                        TextColor="Gray"
@@ -60,29 +70,19 @@
                        FontSize="Small"
                        HeightRequest="20"/>
             </StackLayout>
-            <StackLayout WidthRequest="30"
-                         BackgroundColor="Transparent"/>
-            <Button Text="上一个"
+            <ImageButton Source="previous.png"
                     Margin="10"
                     BackgroundColor="Transparent"
-                    BorderColor="Gray"
-                    BorderWidth="1"
-                    TextColor="Gray"
                     VerticalOptions="End"
                     HorizontalOptions="Center"
                     HeightRequest="40"
-                    WidthRequest="75"
                     Clicked="OnPreviousClicked"/>
-            <Button Text="删除"
+            <ImageButton Source="delete.png"
                     Margin="10"
                     BackgroundColor="Transparent"
-                    BorderColor="Gray"
-                    BorderWidth="1"
-                    TextColor="Gray"
                     VerticalOptions="End"
                     HorizontalOptions="Center"
                     HeightRequest="40"
-                    WidthRequest="75"
                     Clicked="OnDeleteClicked"/>
             <StackLayout Margin="10"
                          BackgroundColor="Transparent"/>
@@ -90,13 +90,13 @@
         <StackLayout Orientation="Horizontal" 
                      HorizontalOptions="End" 
                      BackgroundColor="Transparent"
-                     Margin="5" >
+                     Spacing="20">
             <StackLayout Orientation="Vertical" 
                          BackgroundColor="Transparent"
                          HorizontalOptions="End"
                          VerticalOptions="Center"
                          Margin="5">
-                <Label x:Name="deleteNum" 
+                <Label Text="{Binding DeleteNum, StringFormat='{0}:删除'}"
                        VerticalOptions="Center"
                        HorizontalOptions="End"
                        TextColor="Gray"
@@ -105,7 +105,7 @@
                        HorizontalTextAlignment="End"
                        FontSize="Small"
                        HeightRequest="20"/>
-                <Label x:Name="markNum"
+                <Label Text="{Binding MarkNum, StringFormat='{0}:标记'}"
                        VerticalOptions="Center"
                        HorizontalOptions="End"
                        TextColor="Gray"
@@ -115,30 +115,20 @@
                        FontSize="Small"
                        HeightRequest="20"/>
             </StackLayout>
-            <StackLayout WidthRequest="30"
-                         BackgroundColor="Transparent"/>
-            <Button Text="标记"
-                    Margin="10"
-                    BackgroundColor="Transparent"
-                    BorderColor="Gray"
-                    BorderWidth="1"
-                    TextColor="Gray"
-                    VerticalOptions="Start"
-                    HorizontalOptions="Center"
-                    HeightRequest="40"
-                    WidthRequest="75"
-                    Clicked="OnMarkClicked"/>
-            <Button Text="下一个"
-                    Margin="10"
-                    BackgroundColor="Transparent"
-                    BorderColor="Gray"
-                    BorderWidth="1"
-                    TextColor="Gray"
-                    VerticalOptions="Start"
-                    HorizontalOptions="Center"
-                    HeightRequest="40"
-                    WidthRequest="75"
-                    Clicked="OnNextClicked"/>
+                <ImageButton Source="mark.png"
+                             Margin="10"
+                             BackgroundColor="Transparent"
+                             VerticalOptions="Start"
+                             HorizontalOptions="Center"
+                             HeightRequest="40"
+                             Clicked="OnMarkClicked"/>
+                <ImageButton Source="next.png"
+                             Margin="10"
+                             BackgroundColor="Transparent"
+                             VerticalOptions="Start"
+                             HorizontalOptions="Center"
+                             HeightRequest="40"
+                             Clicked="OnNextClicked"/>
             <StackLayout Margin="10"/>
         </StackLayout>
         <StackLayout HeightRequest="20"

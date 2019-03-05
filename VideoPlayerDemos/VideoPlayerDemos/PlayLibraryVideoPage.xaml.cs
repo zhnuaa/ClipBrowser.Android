@@ -3,184 +3,276 @@ using Xamarin.Forms;
 using FormsVideoLibrary;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ClipBrowser
 {
     public partial class PlayLibraryVideoPage : ContentPage
     {
-        private int currentIndex;
-        public List<string> videoList;
-
+        public VideoListStatus status;
         public PlayLibraryVideoPage()
         {
             InitializeComponent();
-            currentIndex = 0;
-            videoList = new List<string>();
-            resetInfo();
+            status = new VideoListStatus();            
+            rootStack.BindingContext = status;
         }
 
        async void OnSelectVideoClicked(object sender, EventArgs args)
        {
-            Button btn = (Button)sender;
+            ImageButton btn = (ImageButton)sender;
             btn.IsEnabled = false;
 
             KeyValuePair<List<string>, int>? videoDict = await DependencyService.Get<IVideoPicker>().GetVideoFileAsync();
-
+            status.CountReset();
             if (videoDict!=null)
             {
-                resetInfo();
-                currentIndex = videoDict.Value.Value;
-                videoList = videoDict.Value.Key;
-                videoPlayer.Source = new FileVideoSource
-                {
-                    File = videoList[currentIndex]
-                };
-                updateInfo(videoList.Count, currentIndex, 0, 0);
+                status.VideoList = videoDict.Value.Key;
+                status.Index = videoDict.Value.Value;
             }
             btn.IsEnabled = true;
        }
 
         private void OnPreviousClicked(object sender, EventArgs e)
         {
-            Button btn = (Button)sender;
+            ImageButton btn = (ImageButton)sender;
             btn.IsEnabled = false;
-            if (currentIndex-1 >= 0)
+            if (status.Index == 0)
             {
-                currentIndex--;
-                if (videoPlayer.Status == VideoStatus.Playing)
-                {
-                    videoPlayer.Stop();
-                }
-                videoPlayer.Source = new FileVideoSource
-                {
-                    File = videoList[currentIndex]
-                };
-                updateInfo(0, -1, 0, 0);
-                System.Diagnostics.Debug.WriteLine(videoList[currentIndex]);
+                DisplayAlert(@"提示", @"已经到达第一个视频", @"确认");
             }
             else
             {
-                if (videoPlayer.Status == VideoStatus.Playing)
-                {
-                    videoPlayer.Pause();
-                }
-                else if (videoPlayer.Status == VideoStatus.Paused)
-                {
-                    videoPlayer.Play();
-                }
+                status.Index--;
             }
             btn.IsEnabled = true;
         }
 
         private void OnNextClicked(object sender, EventArgs e)
         {
-            Button btn = (Button)sender;
+            ImageButton btn = (ImageButton)sender;
             btn.IsEnabled = false;
-            if (currentIndex + 1 < videoList.Count)
+            if (status.Index == status.VideoList.Count - 1)
             {
-                currentIndex++;
-                if(videoPlayer.Status==VideoStatus.Playing)
-                {
-                    videoPlayer.Stop();
-                }
-                videoPlayer.Source = new FileVideoSource
-                {
-                    File = videoList[currentIndex]
-                };
-                updateInfo(0, 1, 0, 0);
-                System.Diagnostics.Debug.WriteLine(videoList[currentIndex]);
+                videoPlayer.Stop();
+                DisplayAlert(@"提示",@"已经到达最后一个视频",@"确认");
             }
             else
             {
-                if (videoPlayer.Status == VideoStatus.Playing)
-                {
-                    videoPlayer.Pause();
-                    updateInfo(0, 1, 0, 0);
-                }       
-                else if (videoPlayer.Status == VideoStatus.Paused)
-                {
-                    videoPlayer.Play();
-                    updateInfo(0, -1, 0, 0);
-                }
-            }            
+                status.Index++;
+            }
+            btn.IsEnabled = true;
+        }
+
+        private void OnMirrorScreenClicked(object sender, EventArgs e)
+        {
+            ImageButton btn = (ImageButton)sender;
+            btn.IsEnabled = false;
+            status.IsLeftHanded = !status.IsLeftHanded;
             btn.IsEnabled = true;
         }
 
         async private void OnDeleteClicked(object sender, EventArgs e)
         {            
-            if (videoList.Count > 0)
+            if (status.VideoList.Count > 0)
             {
-                Button btn = (Button)sender;
+                ImageButton btn = (ImageButton)sender;
                 btn.IsEnabled = false;
                 if (videoPlayer.Status == VideoStatus.Playing)
                 {
                     videoPlayer.Stop();
                 }
-                if (currentIndex + 1 < videoList.Count)
-                {
-                    videoPlayer.Source = new FileVideoSource
-                    {
-                        File = videoList[currentIndex + 1]
-                    };
-                }
-                updateInfo(0, 1, 1, 0);
                 await Task.Run(() => {
-                    if (System.IO.File.Exists(videoList[currentIndex]))
+                    if (System.IO.File.Exists(status.CurrentVideo.File))
                     {
-                        System.IO.File.Delete(videoList[currentIndex]);
-                        videoList.RemoveAt(currentIndex);
+                        System.IO.File.Delete(status.CurrentVideo.File);
+                        status.VideoList.RemoveAt(status.Index);
                     }
                 });
+                status.DeleteNum++;
+                if (status.Index >= status.VideoList.Count)
+                {
+                    await DisplayAlert(@"提示", @"已经到达最后一个视频", @"确认");
+                }
+                else
+                {
+                    status.Index = status.Index;
+                }
                 btn.IsEnabled = true;
             }                       
         }
         async private void OnMarkClicked(object sender, EventArgs e)
         {
-            if (videoList.Count > 0)
+            if (status.VideoList.Count > 0)
             {
-                Button btn = (Button)sender;
+                ImageButton btn = (ImageButton)sender;
                 btn.IsEnabled = false;
                 if (videoPlayer.Status == VideoStatus.Playing)
                 {
                     videoPlayer.Stop();
                 }
                 await Task.Run(() => {
-                    var video = videoList[currentIndex];
+                    var video = status.CurrentVideo.File;
                     if (System.IO.File.Exists(video))
                     {
                         var newVideoName = System.IO.Path.ChangeExtension(video, ".mark.mp4");
                         System.IO.File.Move(video, newVideoName);
-                        videoList[currentIndex] = newVideoName;
+                        status.VideoList[status.Index] = newVideoName;
                     }
                 });
-                if (currentIndex + 1 < videoList.Count)
+                status.MarkNum++;
+                if (status.Index == status.VideoList.Count - 1)
                 {
-                    currentIndex++;
-                    videoPlayer.Source = new FileVideoSource
-                    {
-                        File = videoList[currentIndex]
-                    };
+                    await DisplayAlert(@"提示", @"已经到达最后一个视频", @"确认");
                 }
-                updateInfo(0, 1, 0, 1);
+                else
+                {
+                    status.Index++;
+                }
                 btn.IsEnabled = true;
             }            
         }
-        private void updateInfo(int deltaTotal=0,int deltaLeft=0,int deltaDelete=0,int deltaMark=0)
-        {
-            videoName.Text = System.IO.Path.GetFileName(videoList[currentIndex]);
-            int num = 0;
-            totalNum.Text = string.Format("{0}:总数", int.TryParse(totalNum.Text.Split(':')[0], out num) ? (num + deltaTotal).ToString() : deltaTotal.ToString());
-            leftNum.Text = string.Format("{0}:剩余", int.TryParse(leftNum.Text.Split(':')[0], out num) ? (num - deltaLeft).ToString() : (int.Parse(totalNum.Text.Split(':')[0])-deltaLeft).ToString());
-            deleteNum.Text = string.Format("{0}:删除", int.TryParse(deleteNum.Text.Split(':')[0], out num) ? (num + deltaDelete).ToString() : deltaDelete.ToString());
-            markNum.Text = string.Format("{0}:标记", int.TryParse(markNum.Text.Split(':')[0], out num) ? (num + deltaMark).ToString() : deltaMark.ToString());
+    }
+
+
+    public class VideoListStatus : System.ComponentModel.INotifyPropertyChanged
+    {
+        public int TotalNum { get; private set; }
+        //total video number
+        private List<string> videoList;
+        public List<string> VideoList
+    {
+            get { return videoList; }
+            set
+            {
+                videoList = value;
+                TotalNum = videoList.Count;
+                NotifyPropertyChanged("TotalNum");
+                NotifyPropertyChanged("VideoList");
+            }
         }
-        private void resetInfo()
+        //video number left in list
+        public int LeftNum
         {
-            videoName.Text = "";
-            totalNum.Text = "";
-            leftNum.Text = "";
-            deleteNum.Text = "";
-            markNum.Text = "";
+            get
+            {
+                if (videoList.Count > 0)
+                {
+                    return VideoList.Count - index - 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+        //video number marked
+        private int markNum;
+        public int MarkNum
+        {
+            get { return markNum; }
+            set
+            {
+                markNum = value;
+                NotifyPropertyChanged("MarkNum");
+            }
+        }
+        //video number deleted
+        private int deleteNum;
+        public int DeleteNum
+        {
+            get { return deleteNum; }
+            set
+            {
+                deleteNum = value;
+                NotifyPropertyChanged("DeleteNum");
+            }
+        }
+        
+        //current video playing
+        public string CurrentVideoName
+        {
+            get
+            {
+                if (videoList.Count > 0)
+                {
+                    return System.IO.Path.GetFileName(VideoList[index]);
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+        public FileVideoSource CurrentVideo
+        {
+            get
+            {
+                if (videoList.Count > 0)
+                {
+                    return new FileVideoSource() { File = VideoList[index] };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+        //index of video is playing
+        private int index;        
+        public int Index
+        {
+            get { return index; }
+            set
+            {
+                index = value;
+                NotifyPropertyChanged("Index");
+                NotifyPropertyChanged("CurrentVideo");
+                NotifyPropertyChanged("CurrentVideoName");
+                NotifyPropertyChanged("LeftNum");
+            }
+        }
+        //handed mode
+        private bool isLeftHanded;
+        public bool IsLeftHanded
+        {
+            get { return isLeftHanded; }
+            set
+            {
+                isLeftHanded = value;
+                NotifyPropertyChanged("IsLeftHanded");
+                NotifyPropertyChanged("ScreenDirection");
+            }
+        }
+        //screen flowdirection
+        public FlowDirection ScreenDirection
+        {
+            get { return isLeftHanded ? FlowDirection.RightToLeft : FlowDirection.LeftToRight; }
+        }
+        //构造函数
+        public VideoListStatus()
+        {
+            isLeftHanded = false;
+            videoList = new List<string>();
+            VideoList = new List<string>();            
+            Index = 0;
+            MarkNum = 0;
+            DeleteNum = 0;
+        }
+        public void CountReset()
+        {
+            VideoList = new List<string>();            
+            Index = 0;
+            MarkNum = 0;
+            DeleteNum = 0;
+        }
+
+        //注册属性改变事件，便于通告属性改变
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(string prop)
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(prop));
         }
     }
+
+
 }
