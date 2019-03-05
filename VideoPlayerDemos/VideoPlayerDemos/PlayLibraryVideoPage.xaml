@@ -4,7 +4,9 @@
              xmlns:video="clr-namespace:FormsVideoLibrary"
              xmlns:local="clr-namespace:ClipBrowser"
              x:Class="ClipBrowser.PlayLibraryVideoPage"
-             Title="Play Library Video" >
+             Title="Play Library Video"
+             Disappearing="SaveConfigOnDisappearing"
+             Appearing="LoadConfigOnAppearing">
     <StackLayout x:Name="rootStack"
                  BackgroundColor="Black" 
                  FlowDirection="{Binding ScreenDirection}">
@@ -36,7 +38,6 @@
                          Clicked="OnSelectVideoClicked"
                          HeightRequest="30"/>
         </StackLayout>
-
         <video:VideoPlayer x:Name="videoPlayer"
                            AutoLoop="True"
                            AreTransportControlsEnabled="False"
@@ -115,9 +116,9 @@
                        FontSize="Small"
                        HeightRequest="20"/>
             </StackLayout>
-                <ImageButton Source="mark.png"
+                <ImageButton Source="{Binding MarkImage}"
                              Margin="10"
-                             BackgroundColor="Transparent"
+                             BackgroundColor="Transparent" 
                              VerticalOptions="Start"
                              HorizontalOptions="Center"
                              HeightRequest="40"

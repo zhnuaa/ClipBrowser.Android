@@ -4,20 +4,46 @@ using FormsVideoLibrary;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+using System.IO;
+using System.ComponentModel;
 
 namespace ClipBrowser
-{
+{    
     public partial class PlayLibraryVideoPage : ContentPage
     {
+        private string configFile;
+        private AppConfig config;
         public VideoListStatus status;
+
         public PlayLibraryVideoPage()
         {
             InitializeComponent();
+            configFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "config.xml");
+            config = AppConfig.LoadFromDisk(configFile);
             status = new VideoListStatus();            
             rootStack.BindingContext = status;
+            status.IsLeftHanded = config.IsLeftHanded;
+            status.PropertyChanged += UpdateInfoToConfig;
         }
 
-       async void OnSelectVideoClicked(object sender, EventArgs args)
+        private void UpdateInfoToConfig(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Index")
+            {
+                config.Index = status.Index;
+            }
+            else if (e.PropertyName == "VideoList")
+            {
+                config.VideoList = status.VideoList;
+            }
+            else if (e.PropertyName == "IsLeftHanded")
+            {
+                config.IsLeftHanded = status.IsLeftHanded;
+            }
+        }
+
+        async void OnSelectVideoClicked(object sender, EventArgs args)
        {
             ImageButton btn = (ImageButton)sender;
             btn.IsEnabled = false;
@@ -28,6 +54,7 @@ namespace ClipBrowser
             {
                 status.VideoList = videoDict.Value.Key;
                 status.Index = videoDict.Value.Value;
+                status.IsEdited = true;
             }
             btn.IsEnabled = true;
        }
@@ -88,7 +115,7 @@ namespace ClipBrowser
                         status.VideoList.RemoveAt(status.Index);
                     }
                 });
-                status.DeleteNum++;
+                status.IsEdited = true;
                 if (status.Index >= status.VideoList.Count)
                 {
                     await DisplayAlert(@"提示", @"已经到达最后一个视频", @"确认");
@@ -114,12 +141,20 @@ namespace ClipBrowser
                     var video = status.CurrentVideo.File;
                     if (System.IO.File.Exists(video))
                     {
-                        var newVideoName = System.IO.Path.ChangeExtension(video, ".mark.mp4");
+                        string newVideoName;
+                        if (video.EndsWith(".mark.mp4"))
+                        {
+                            newVideoName = video.Replace(".mark.mp4", ".mp4");
+                        }
+                        else
+                        {
+                            newVideoName = System.IO.Path.ChangeExtension(video, ".mark.mp4");
+                        }                        
                         System.IO.File.Move(video, newVideoName);
                         status.VideoList[status.Index] = newVideoName;
                     }
                 });
-                status.MarkNum++;
+                status.IsEdited = true;
                 if (status.Index == status.VideoList.Count - 1)
                 {
                     await DisplayAlert(@"提示", @"已经到达最后一个视频", @"确认");
@@ -130,6 +165,39 @@ namespace ClipBrowser
                 }
                 btn.IsEnabled = true;
             }            
+        }
+         private void SaveConfigOnDisappearing(object sender, EventArgs e)
+        {
+            config.SaveToDisk();
+        }
+
+        async private void LoadConfigOnAppearing(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format("路径:{0}", configFile));
+            //if browse record in config is valid,try to load it
+            if (config.VideoList != null)
+            {
+                if (config.VideoList.Count > 0 && config.VideoList.Count > config.Index)
+                {
+                    string currentVideo = config.VideoList[config.Index];
+                    if (File.Exists(currentVideo))
+                    {
+                        string videoDir = Path.GetDirectoryName(currentVideo);
+                        List<string> videoList = new List<string>(Directory.GetFiles(videoDir, "*.mp4", SearchOption.TopDirectoryOnly));
+                        int index = videoList.IndexOf(currentVideo);
+                        if (videoList.Count > 0 && index < videoList.Count - 1) //列表里有视频，且视频不是最后一个
+                        {
+                            var action = await DisplayActionSheet("发现浏览记录", null,null,"忽略记录", "继续浏览");
+                            if (action!= "忽略记录")
+                            {
+                                status.VideoList = videoList;
+                                status.Index = index;
+                                status.IsEdited = true;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -157,7 +225,7 @@ namespace ClipBrowser
             {
                 if (videoList.Count > 0)
                 {
-                    return VideoList.Count - index - 1;
+                    return VideoList.Count - index;
                 }
                 else
                 {
@@ -166,28 +234,27 @@ namespace ClipBrowser
             }
         }
         //video number marked
-        private int markNum;
         public int MarkNum
         {
-            get { return markNum; }
-            set
-            {
-                markNum = value;
-                NotifyPropertyChanged("MarkNum");
-            }
+            get { return videoList.FindAll(video => { return video.EndsWith(".mark.mp4"); }).Count; }            
         }
         //video number deleted
-        private int deleteNum;
         public int DeleteNum
         {
-            get { return deleteNum; }
+            get { return TotalNum - videoList.Count; }
+        }
+        private bool isEdited;
+        public bool IsEdited
+        {
+            get { return isEdited; }
             set
             {
-                deleteNum = value;
+                isEdited = value;
+                NotifyPropertyChanged("MarkNum");
                 NotifyPropertyChanged("DeleteNum");
             }
         }
-        
+
         //current video playing
         public string CurrentVideoName
         {
@@ -229,6 +296,7 @@ namespace ClipBrowser
                 NotifyPropertyChanged("CurrentVideo");
                 NotifyPropertyChanged("CurrentVideoName");
                 NotifyPropertyChanged("LeftNum");
+                NotifyPropertyChanged("MarkImage");
             }
         }
         //handed mode
@@ -248,6 +316,14 @@ namespace ClipBrowser
         {
             get { return isLeftHanded ? FlowDirection.RightToLeft : FlowDirection.LeftToRight; }
         }
+        //mark button image
+        public string MarkImage
+        {
+            get
+            {
+                return CurrentVideoName.EndsWith(".mark.mp4") ? "marked.png" : "mark.png";
+            }
+        }
         //构造函数
         public VideoListStatus()
         {
@@ -255,15 +331,11 @@ namespace ClipBrowser
             videoList = new List<string>();
             VideoList = new List<string>();            
             Index = 0;
-            MarkNum = 0;
-            DeleteNum = 0;
         }
         public void CountReset()
         {
             VideoList = new List<string>();            
             Index = 0;
-            MarkNum = 0;
-            DeleteNum = 0;
         }
 
         //注册属性改变事件，便于通告属性改变
@@ -274,5 +346,43 @@ namespace ClipBrowser
         }
     }
 
+    [Serializable]
+    public class AppConfig
+    {  
+        public string ConfigFile { get; set; }
+        public bool IsLeftHanded { get; set; }
+        public List<string> VideoList { get; set; }
+        public int Index { get; set; }
 
+        public AppConfig()
+        {
+            ConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "config.xml");
+            IsLeftHanded = false;
+            VideoList = new List<string>();
+            Index = 0;
+        }
+        //保存到硬盘
+        public void SaveToDisk()
+        {
+            FileStream fs = new FileStream(ConfigFile, FileMode.Create);
+            XmlSerializer xs = new XmlSerializer(this.GetType());
+            xs.Serialize(fs, this);
+            fs.Close();
+        }
+
+        //从硬盘上读取设置文件
+        public static AppConfig LoadFromDisk(string configFile)
+        {
+            AppConfig settings = new AppConfig();
+            if (System.IO.File.Exists(configFile))
+            {
+                FileStream fs = new FileStream(configFile, FileMode.Open);
+                XmlSerializer xs = new XmlSerializer(typeof(AppConfig));
+                settings = xs.Deserialize(fs) as AppConfig;
+                fs.Close();
+            }
+            settings.ConfigFile = configFile;//更正配置文件地址
+            return settings;
+        }
+    }
 }
