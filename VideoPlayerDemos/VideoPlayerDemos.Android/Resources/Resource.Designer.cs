@@ -5330,14 +5330,14 @@ namespace ClipBrowser.Droid
 			// aapt resource value: 0x7f0800cb
 			public const int main_toolbar = 2131230923;
 			
-			// aapt resource value: 0x7f0800d5
-			public const int masked = 2131230933;
+			// aapt resource value: 0x7f0800d3
+			public const int masked = 2131230931;
 			
 			// aapt resource value: 0x7f0800bd
 			public const int media_actions = 2131230909;
 			
-			// aapt resource value: 0x7f0800d3
-			public const int message = 2131230931;
+			// aapt resource value: 0x7f0800d1
+			public const int message = 2131230929;
 			
 			// aapt resource value: 0x7f080031
 			public const int middle = 2131230769;
@@ -5555,9 +5555,6 @@ namespace ClipBrowser.Droid
 			// aapt resource value: 0x7f080025
 			public const int showTitle = 2131230757;
 			
-			// aapt resource value: 0x7f0800d1
-			public const int sliding_tabs = 2131230929;
-			
 			// aapt resource value: 0x7f08008d
 			public const int smallLabel = 2131230861;
 			
@@ -5636,9 +5633,6 @@ namespace ClipBrowser.Droid
 			// aapt resource value: 0x7f08006f
 			public const int title_template = 2131230831;
 			
-			// aapt resource value: 0x7f0800d2
-			public const int toolbar = 2131230930;
-			
 			// aapt resource value: 0x7f08003e
 			public const int top = 2131230782;
 			
@@ -5675,8 +5669,8 @@ namespace ClipBrowser.Droid
 			// aapt resource value: 0x7f080016
 			public const int view_offset_helper = 2131230742;
 			
-			// aapt resource value: 0x7f0800d4
-			public const int visible = 2131230932;
+			// aapt resource value: 0x7f0800d2
+			public const int visible = 2131230930;
 			
 			// aapt resource value: 0x7f0800af
 			public const int volume_item_container = 2131230895;
@@ -5979,13 +5973,7 @@ namespace ClipBrowser.Droid
 			public const int support_simple_spinner_dropdown_item = 2130903108;
 			
 			// aapt resource value: 0x7f030045
-			public const int Tabbar = 2130903109;
-			
-			// aapt resource value: 0x7f030046
-			public const int Toolbar = 2130903110;
-			
-			// aapt resource value: 0x7f030047
-			public const int tooltip = 2130903111;
+			public const int tooltip = 2130903109;
 			
 			static Layout()
 			{
@@ -6210,9 +6198,6 @@ namespace ClipBrowser.Droid
 			
 			// aapt resource value: 0x7f0b016e
 			public const int Animation_Design_BottomSheetDialog = 2131427694;
-			
-			// aapt resource value: 0x7f0b0191
-			public const int AppCompatDialogStyle = 2131427729;
 			
 			// aapt resource value: 0x7f0b00a9
 			public const int Base_AlertDialog_AppCompat = 2131427497;
@@ -6714,12 +6699,6 @@ namespace ClipBrowser.Droid
 			
 			// aapt resource value: 0x7f0b000e
 			public const int CardView_Light = 2131427342;
-			
-			// aapt resource value: 0x7f0b018f
-			public const int MainTheme = 2131427727;
-			
-			// aapt resource value: 0x7f0b0190
-			public const int MainTheme_Base = 2131427728;
 			
 			// aapt resource value: 0x7f0b002d
 			public const int Platform_AppCompat = 2131427373;

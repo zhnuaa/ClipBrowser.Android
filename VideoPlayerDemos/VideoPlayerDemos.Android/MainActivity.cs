@@ -12,16 +12,13 @@ using Android.Provider;
 
 namespace ClipBrowser.Droid
 {
-    [Activity(Label = @"短片浏览", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    [Activity(Label = @"短片浏览", Icon = "@drawable/icon", Theme = "@android:style/Theme.Material.NoActionBar.Fullscreen", MainLauncher = true)]
+    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsApplicationActivity
     {
         protected override void OnCreate(Bundle bundle)
         {
+            //SetTheme(Android.Resource.Style.ThemeHoloNoActionBarFullscreen);
             Current = this;
-
-            TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
-            SetTheme(Android.Resource.Style.ThemeNoTitleBarFullScreen);
             base.OnCreate(bundle);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);

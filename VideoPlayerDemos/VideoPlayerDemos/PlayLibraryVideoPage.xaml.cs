@@ -183,17 +183,16 @@ namespace ClipBrowser
                     if (File.Exists(currentVideo))
                     {
                         string videoDir = Path.GetDirectoryName(currentVideo);
-                        List<string> videoList = new List<string>(Directory.GetFiles(videoDir, "*.mp4", SearchOption.TopDirectoryOnly));
-                        int index = videoList.IndexOf(currentVideo);
-                        if (videoList.Count > 0 && index < videoList.Count - 1) //列表里有视频，且视频不是最后一个
+                        List<string> videoList = await Task<List<string>>.Run(() =>
                         {
-                            var action = await DisplayActionSheet("发现浏览记录", null,null,"忽略记录", "继续浏览");
-                            if (action!= "忽略记录")
-                            {
-                                status.VideoList = videoList;
-                                status.Index = index;
-                                status.IsEdited = true;
-                            }
+                            return new List<string>(Directory.GetFiles(videoDir, "*.mp4", SearchOption.TopDirectoryOnly));
+                        });
+                        var action = await DisplayActionSheet("发现浏览记录", null, null, "忽略记录", "继续浏览");
+                        if (action == "继续浏览")
+                        {
+                            status.VideoList = videoList;
+                            status.Index = videoList.IndexOf(currentVideo);
+                            status.IsEdited = true;
                         }
                     }
                 }
@@ -359,7 +358,7 @@ namespace ClipBrowser
             ConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "config.xml");
             IsLeftHanded = false;
             VideoList = new List<string>();
-            Index = 0;
+            Index = 0;          
         }
         //保存到硬盘
         public void SaveToDisk()
