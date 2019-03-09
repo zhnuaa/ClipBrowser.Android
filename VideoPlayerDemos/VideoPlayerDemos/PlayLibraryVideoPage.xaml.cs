@@ -177,7 +177,7 @@ namespace ClipBrowser
             //if browse record in config is valid,try to load it
             if (config.VideoList != null)
             {
-                if (config.VideoList.Count > 0 && config.VideoList.Count > config.Index)
+                if (config.VideoList.Count > 0 && config.VideoList.Count-1 > config.Index)
                 {
                     string currentVideo = config.VideoList[config.Index];
                     if (File.Exists(currentVideo))

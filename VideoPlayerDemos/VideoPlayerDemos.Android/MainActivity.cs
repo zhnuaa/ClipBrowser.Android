@@ -17,7 +17,6 @@ namespace ClipBrowser.Droid
     {
         protected override void OnCreate(Bundle bundle)
         {
-            //SetTheme(Android.Resource.Style.ThemeHoloNoActionBarFullscreen);
             Current = this;
             base.OnCreate(bundle);
 
