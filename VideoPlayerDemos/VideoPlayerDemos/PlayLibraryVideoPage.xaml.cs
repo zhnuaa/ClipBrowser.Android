@@ -44,50 +44,56 @@ namespace ClipBrowser
         }
 
         async void OnSelectVideoClicked(object sender, EventArgs args)
-       {
+        {
             ImageButton btn = (ImageButton)sender;
             btn.IsEnabled = false;
 
             KeyValuePair<List<string>, int>? videoDict = await DependencyService.Get<IVideoPicker>().GetVideoFileAsync();
             status.CountReset();
-            if (videoDict!=null)
+            if (videoDict != null)
             {
                 status.VideoList = videoDict.Value.Key;
                 status.Index = videoDict.Value.Value;
                 status.IsEdited = true;
             }
-            btn.IsEnabled = true;
-       }
+            btn.IsEnabled = true;                    
+        }
 
         private void OnPreviousClicked(object sender, EventArgs e)
-        {
-            ImageButton btn = (ImageButton)sender;
-            btn.IsEnabled = false;
-            if (status.Index == 0)
+        {            
+            if (status.VideoList.Count > 0)
             {
-                DisplayAlert(@"提示", @"已经到达第一个视频", @"确认");
-            }
-            else
-            {
-                status.Index--;
-            }
-            btn.IsEnabled = true;
+                ImageButton btn = (ImageButton)sender;
+                btn.IsEnabled = false;
+                if (status.Index == 0)
+                {
+                    DisplayAlert(@"提示", @"已经到达第一个视频", @"确认");
+                }
+                else
+                {
+                    status.Index--;
+                }
+                btn.IsEnabled = true;
+            }            
         }
 
         private void OnNextClicked(object sender, EventArgs e)
         {
-            ImageButton btn = (ImageButton)sender;
-            btn.IsEnabled = false;
-            if (status.Index == status.VideoList.Count - 1)
+            if (status.VideoList.Count > 0)
             {
-                videoPlayer.Stop();
-                DisplayAlert(@"提示",@"已经到达最后一个视频",@"确认");
-            }
-            else
-            {
-                status.Index++;
-            }
-            btn.IsEnabled = true;
+                ImageButton btn = (ImageButton)sender;
+                btn.IsEnabled = false;
+                if (status.Index == status.VideoList.Count - 1)
+                {
+                    videoPlayer.Stop();
+                    DisplayAlert(@"提示", @"已经到达最后一个视频", @"确认");
+                }
+                else
+                {
+                    status.Index++;
+                }
+                btn.IsEnabled = true;
+            }            
         }
 
         private void OnMirrorScreenClicked(object sender, EventArgs e)
@@ -166,7 +172,7 @@ namespace ClipBrowser
                 btn.IsEnabled = true;
             }            
         }
-         private void SaveConfigOnDisappearing(object sender, EventArgs e)
+        private void SaveConfigOnDisappearing(object sender, EventArgs e)
         {
             config.SaveToDisk();
         }
