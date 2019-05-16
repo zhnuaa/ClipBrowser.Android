@@ -1,11 +1,11 @@
-Video Player Demos
+ClipBrowser
 ================
 
-This sample demonstrates renderers for a `VideoPlayer` custom control.
+This is a simple video clip browser.
 
-For more information about this sample see [Implementing a Video Player](https://developer.xamarin.com/guides/xamarin-forms/application-fundamentals/custom-renderer/video-player/).
+![screenshot](./screenshot.png)
 
 Author
 ------
 
-Charles Petzold
+ZHANG
